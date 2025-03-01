@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Informations sur la base de données
     private static final String DATABASE_NAME = "OujdaShop.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // Table des catégories
     private static final String TABLE_CATEGORIES = "categories";
@@ -29,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_BOOK_ID = "id";
     private static final String COLUMN_BOOK_NAME = "name";
     private static final String COLUMN_BOOK_CATEGORY_ID = "category_id";
-    private static final String COLUMN_BOOK_IMAGE = "image_id";
+    private static final String COLUMN_BOOK_IMAGE = "image";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,7 +49,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-
         String CREATE_CATEGORIES_TABLE = "CREATE TABLE categories (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "name TEXT NOT NULL)";
@@ -57,30 +57,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         // Créer la table des livres
-        String CREATE_BOOKS_TABLE = "CREATE TABLE " + TABLE_BOOKS + "("
-                + COLUMN_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_BOOK_NAME + " TEXT,"
-                + COLUMN_BOOK_AUTHOR + " TEXT,"
-                + COLUMN_BOOK_DESCRIPTION + " TEXT,"
-                + COLUMN_BOOK_PRICE + " REAL,"
-                + COLUMN_BOOK_IMAGE + " TEXT," // Nouvelle colonne pour l'image
-                + COLUMN_BOOK_CATEGORY_ID + " INTEGER,"
-                + "FOREIGN KEY(" + COLUMN_BOOK_CATEGORY_ID + ") REFERENCES "
-                + TABLE_CATEGORIES + "(" + COLUMN_CATEGORY_ID + "))";
+        String CREATE_BOOKS_TABLE = "CREATE TABLE books (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL," +
+                "author TEXT," +
+                "description TEXT," +
+                "price REAL NOT NULL," +
+                "image TEXT," + // Colonne "image" ajoutée
+                "category_id INTEGER NOT NULL)";
         db.execSQL(CREATE_BOOKS_TABLE);
 
         // Insérer des données initiales
+
         insertInitialData(db);
+
+        Log.d("DatabaseHelper", "onCreate called");
     }
+
 
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Supprimer les tables existantes
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKS);
         db.execSQL("DROP TABLE IF EXISTS categories");
+        db.execSQL("DROP TABLE IF EXISTS books");
+
+        // Recréer les tables
         onCreate(db);
+        Log.d("DatabaseHelper", "onUpgrade called from " + oldVersion + " to " + newVersion);
     }
 
     public boolean addUser(String firstName, String lastName, String email, String password) {
@@ -154,24 +159,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertBook(db, "L’Art de la victoire", "(Shoe Dog) – Phil Knight (2016)", "L’autobiographie inspirante du fondateur de Nike. Il raconte son parcours, de ses débuts modestes en vendant des chaussures de sport depuis le coffre de sa voiture, jusqu’à la création d’une des marques les plus puissantes du monde. Une leçon de persévérance et d’entrepreneuriat.", 14.99,"da_vinci_code", 4);
 
 
-        insertBook(db, "Une brève histoire du temps", "Stephen Hawking (1988)", "Un best-seller qui explique de manière accessible les grands concepts de la physique moderne : trous noirs, Big Bang, relativité et mécanique quantique. Parfait pour ceux qui veulent comprendre l'univers sans être experts en maths..", 14.99,"da_vinci_code", 5);
-        insertBook(db, "Le Gène : Une histoire intime ", "Siddhartha Mukherjee (2016)", "Un livre fascinant sur l’histoire de la génétique, expliquant comment nos gènes influencent notre santé, notre personnalité et notre avenir. Il aborde aussi les implications éthiques des avancées en génétique..", 18.99,"da_vinci_code",5);
-        insertBook(db, "Elon Musk", "Walter Isaacson (2023)", "Une biographie détaillée du célèbre entrepreneur, explorant son génie, ses ambitions et les défis qu’il a rencontrés en construisant Tesla, SpaceX et d'autres entreprises révolutionnaires.", 14.99,"da_vinci_code", 5);
+        insertBook(db, "Une brève histoire du temps", "Stephen Hawking (1988)", "Un best-seller qui explique de manière accessible les grands concepts de la physique moderne : trous noirs, Big Bang, relativité et mécanique quantique. Parfait pour ceux qui veulent comprendre l'univers sans être experts en maths..", 14.99,"breve_histoire_du_temps", 5);
+        insertBook(db, "Le Gène : Une histoire intime ", "Siddhartha Mukherjee (2016)", "Un livre fascinant sur l’histoire de la génétique, expliquant comment nos gènes influencent notre santé, notre personnalité et notre avenir. Il aborde aussi les implications éthiques des avancées en génétique..", 18.99,"gene",5);
+        insertBook(db, "Elon Musk", "Walter Isaacson (2023)", "Une biographie détaillée du célèbre entrepreneur, explorant son génie, ses ambitions et les défis qu’il a rencontrés en construisant Tesla, SpaceX et d'autres entreprises révolutionnaires.", 14.99,"elon_musk", 5);
 
 
-        insertBook(db, "Sapiens : Une brève histoire de l'humanité", "Yuval Noah Harari (2011)", "Un livre captivant qui retrace l’évolution de l’homme depuis la Préhistoire jusqu’à aujourd’hui, expliquant comment nos croyances, cultures et sociétés se sont développées.", 14.99, "da_vinci_code",6);
-        insertBook(db, "Devenir", "Michelle Obama (2018)", "L’autobiographie inspirante de l’ancienne Première Dame des États-Unis, racontant son parcours, ses défis en tant que femme noire en politique et son engagement pour l’éducation et l’égalité..", 18.99,"da_vinci_code", 6);
-        insertBook(db, "Napoléon : La biographie", "Max Gallo (1997)", "Une biographie détaillée de Napoléon Bonaparte, explorant son ascension, ses victoires, ses défaites et son impact durable sur l’histoire de France et du monde.", 14.99,"da_vinci_code", 6);
+        insertBook(db, "Sapiens : Une brève histoire de l'humanité", "Yuval Noah Harari (2011)", "Un livre captivant qui retrace l’évolution de l’homme depuis la Préhistoire jusqu’à aujourd’hui, expliquant comment nos croyances, cultures et sociétés se sont développées.", 14.99, "spatiens",6);
+        insertBook(db, "Devenir", "Michelle Obama (2018)", "L’autobiographie inspirante de l’ancienne Première Dame des États-Unis, racontant son parcours, ses défis en tant que femme noire en politique et son engagement pour l’éducation et l’égalité..", 18.99,"devenir", 6);
+        insertBook(db, "Napoléon : La biographie", "Max Gallo (1997)", "Une biographie détaillée de Napoléon Bonaparte, explorant son ascension, ses victoires, ses défaites et son impact durable sur l’histoire de France et du monde.", 14.99,"napoleon", 6);
 
-        insertBook(db, "L'Investisseur intelligent", "Benjamin Graham (1949)", "Un livre culte sur l’investissement, écrit par le mentor de Warren Buffett. Il explique comment analyser les actions et investir prudemment en bourse sur le long terme.", 14.99, "da_vinci_code",7);
-        insertBook(db, "Père riche, père pauvre", "Robert Kiyosaki (1997)", "Un best-seller sur l’éducation financière, expliquant la différence entre les mentalités des riches et des pauvres et comment mieux gérer son argent pour atteindre l’indépendance financière.", 18.99, "da_vinci_code",7);
-        insertBook(db, "Capital et idéologie", "Thomas Piketty (2019)", "Une analyse de l’évolution des inégalités économiques et des systèmes politiques qui les ont façonnées, avec des propositions pour un modèle plus équitable.", 14.99,"da_vinci_code", 7);
+        insertBook(db, "L'Investisseur intelligent", "Benjamin Graham (1949)", "Un livre culte sur l’investissement, écrit par le mentor de Warren Buffett. Il explique comment analyser les actions et investir prudemment en bourse sur le long terme.", 14.99, "investisseur",7);
+        insertBook(db, "Père riche, père pauvre", "Robert Kiyosaki (1997)", "Un best-seller sur l’éducation financière, expliquant la différence entre les mentalités des riches et des pauvres et comment mieux gérer son argent pour atteindre l’indépendance financière.", 18.99, "pere_riche",7);
+        insertBook(db, "Capital et idéologie", "Thomas Piketty (2019)", "Une analyse de l’évolution des inégalités économiques et des systèmes politiques qui les ont façonnées, avec des propositions pour un modèle plus équitable.", 14.99,"capital_et_idiologie", 7);
 
 
 
-        insertBook(db, "Pourquoi nous dormons", "Matthew Walker (2017)", "Un livre fascinant sur l’importance du sommeil, expliquant comment il influence notre santé, notre mémoire et notre longévité, avec des conseils pour mieux dormir.", 14.99,"da_vinci_code", 8);
-        insertBook(db, "Le Charme discret de l’intestin", "Giulia Enders (2014)", "Un ouvrage ludique et scientifique sur le rôle fondamental de notre intestin, expliquant comment il impacte notre digestion, notre humeur et notre système immunitaire.", 18.99,"da_vinci_code", 8);
-        insertBook(db, "Miracle Morning", "Hal Elrod (2012)", "Un guide pratique sur l’importance d’une routine matinale optimisée pour améliorer sa productivité, son bien-être et atteindre ses objectifs personnels.",18.99,"da_vinci_code", 8);
+        insertBook(db, "Pourquoi nous dormons", "Matthew Walker (2017)", "Un livre fascinant sur l’importance du sommeil, expliquant comment il influence notre santé, notre mémoire et notre longévité, avec des conseils pour mieux dormir.", 14.99,"dormir", 8);
+        insertBook(db, "Le Charme discret de l’intestin", "Giulia Enders (2014)", "Un ouvrage ludique et scientifique sur le rôle fondamental de notre intestin, expliquant comment il impacte notre digestion, notre humeur et notre système immunitaire.", 18.99,"intestin", 8);
+        insertBook(db, "Miracle Morning", "Hal Elrod (2012)", "Un guide pratique sur l’importance d’une routine matinale optimisée pour améliorer sa productivité, son bien-être et atteindre ses objectifs personnels.",18.99,"miracle_morning", 8);
 
     }
 
@@ -192,6 +197,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_BOOK_IMAGE, image); // Ajouter l'image
         values.put(COLUMN_BOOK_CATEGORY_ID, categoryId);
         db.insert(TABLE_BOOKS, null, values);
+
     }
 
 
@@ -290,6 +296,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Créer un nouvel objet Book
                 books.add(new Book(id, name, author, description, price, image, bookCategoryId));
             } while (cursor.moveToNext());
+        } else {
+            Log.d("DatabaseHelper", "Aucun livre trouvé pour la catégorie : " + categoryId);
         }
 
         cursor.close();

@@ -58,10 +58,25 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     private void refreshBooks() {
-        books = dbHelper.getBooksByCategory(categoryId);
-        adapter = new BookAdapter(this, books);
+        // Récupérer les livres de la catégorie depuis la base de données
+        books = dbHelper.getBooksByCategory(categoryId); // Utilisez la variable de classe `books`
+
+        // Afficher les livres dans le GridView
+        adapter = new BookAdapter(this, books); // Utilisez la variable de classe `adapter`
         productGridView.setAdapter(adapter);
+
+        // Gestion du clic sur un livre
+        productGridView.setOnItemClickListener((parent, view, position, id) -> {
+            // Récupérer le livre sélectionné
+            Book selectedBook = books.get(position);
+
+            // Rediriger vers DetailsActivity avec l'ID du livre
+            Intent intent = new Intent(ProductActivity.this, DetailsActivity.class);
+            intent.putExtra("bookId", selectedBook.getId());
+            startActivity(intent);
+        });
     }
+
 
     private void showAddProductDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -184,4 +199,5 @@ public class ProductActivity extends AppCompatActivity {
         dbHelper.deleteBook(selectedBook.getId());
         refreshBooks(); // Rafraîchir la liste
     }
+
 }

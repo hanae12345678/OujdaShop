@@ -21,6 +21,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
         this.books = books;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Récupérer le livre à la position actuelle
@@ -40,8 +41,15 @@ public class BookAdapter extends ArrayAdapter<Book> {
         productNameTextView.setText(book.getName());
         productPriceTextView.setText("Prix : " + book.getPrice() + " €");
 
-
-
+        // Charger l'image du livre
+        String imageName = book.getImage();
+        int imageResId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+        if (imageResId != 0) {
+            productImageView.setImageResource(imageResId);
+        } else {
+            // Image par défaut si l'image n'est pas trouvée
+            productImageView.setImageResource(R.drawable.livre);
+        }
 
         return convertView;
     }

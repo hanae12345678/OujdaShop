@@ -18,7 +18,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        // Utiliser un Handler pour rediriger après 3 secondes
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
